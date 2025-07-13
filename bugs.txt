@@ -1,0 +1,552 @@
+File: Appendix C_.ipynb
+
+Bug 1:
+In the first code cell, the variables `prompt`, `model`, and `output_parser` are used without being defined, leading to a `NameError`.
+Correction:
+Define the variables before use. For example:
+```python
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+from langchain_core.output_parsers import StrOutputParser
+
+prompt = ChatPromptTemplate.from_template("Tell me a joke about {topic}")
+model = ChatOpenAI()
+output_parser = StrOutputParser()
+
+chain = prompt | model | output_parser
+chain.invoke({"topic": "bears"})
+```
+
+Bug 2:
+In the second code cell, `TypedDict` is used without being imported, and the `llm` variable is used without being defined.
+Correction:
+Import `TypedDict` from the `typing` module and define the `llm` variable.
+```python
+from typing import TypedDict
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI()
+
+class State(TypedDict):
+    topic: str
+    joke: str
+    story: str
+    poem: str
+    combined_output: str
+
+# ... rest of the code
+```
+
+
+File: Chapter 1_ Prompt Chaining (Code Example).ipynb
+
+Bug:
+The code relies on the  environment variable, but the lines to load it from a  file using  are commented out. If the user does not have this environment variable set globally, the program will fail with a .
+
+Correction:
+Uncomment the lines for loading the environment variable to make the example more robust and self-contained.
+
+
+
+
+File: Chapter 10_ Model Context Protocol (agent.py for MCP Filesystem Example).ipynb
+
+Bug:
+The code uses  to get the path of the current script. This variable is not defined in a Jupyter Notebook environment, which will cause a  when the cell is executed.
+
+Correction:
+Replace  with a hardcoded path or a more suitable method for getting the current working directory in a notebook, such as .
+
+
+
+
+File: Chapter 11_ Goal Setting and Monitoring (Goal_Setting_Iteration).ipynb
+
+Bug:
+The first cell uses  to install dependencies. While this works in a notebook, it does not persist the dependencies in a  file, making it harder for others to replicate the environment.
+
+Correction:
+Create a  file and list the dependencies there. Then, instruct the user to install the dependencies from the file using .
+
+ content:
+
+
+
+File: Chapter 12_ Exception Handling and Recovery (Agent with Fallback).ipynb
+
+Bug:
+The tools  and  are used when creating the  and  agents, but they are never defined. This will result in a  when the code is executed.
+
+Correction:
+Define the tool functions before they are used in the agent definitions.
+
+
+
+
+File: Chapter 13_ Human-in-the-Loop (Customer Support Agent with Personalization and Escalation).ipynb
+
+Bug:
+The  list for the  is populated with raw function objects (, , ) instead of  instances. The  class expects a list of objects that inherit from .
+
+Correction:
+Wrap each tool function in a  before passing them to the agent.
+
+
+
+
+File: Chapter 14_ Knowledge Retrieval (RAG LangChain).ipynb
+
+Bug 1:
+The URL used to download the  file points to the GitHub HTML page, not the raw file content. This will result in saving HTML tags and other markup in the text file, which will negatively affect the RAG pipeline.
+
+Correction:
+Change the URL to point to the raw version of the file.
+
+
+
+Bug 2:
+The code loads environment variables using  but does not validate that the  is actually present. This can lead to a  later in the code when the OpenAI API is called.
+
+Correction:
+Add a check to ensure the API key is available after loading the .env file.
+
+
+
+
+File: Chapter 14_ Knowledge Retrieval (RAG Google Search).ipynb
+
+Bug:
+The  list for the  is populated with the  class instead of an instance of the class. The  class expects a list of objects that inherit from .
+
+Correction:
+Instantiate the  tool before passing it to the agent.
+
+
+
+
+File: Chapter 14_ Knowledge Retrieval (RAG VertexAI).ipynb
+
+Bug:
+The  variable is a placeholder and needs to be replaced with a valid Vertex AI RAG Corpus resource name for the code to be functional. The current value is .
+
+Correction:
+Replace the placeholder with a valid resource name.
+
+
+
+
+File: Chapter 15_ Inter-Agent Communication (A2A).ipynb
+
+Bug:
+The  is initialized without any arguments. The constructor for  requires a  and .
+
+Correction:
+Provide a name and description when initializing the .
+
+
+
+
+File: Chapter 15_ Inter-Agent Communication (Synchronous and Streaming Requests).json
+
+Bug:
+The file has a  extension, but its content is a Jupyter Notebook with comments, not a valid JSON object. This will cause parsing errors for any application trying to read it as a JSON file.
+
+Correction:
+Either change the file extension to  to reflect its true format, or extract the JSON objects into a valid  file.
+
+To make it a valid JSON file, the content should be:
+
+
+
+File: Chapter 16_ Resource-Aware Optimization (code snippets).ipynb
+
+Bug:
+In the second cell, the  method of the  class is defined without the  keyword, which will cause a . Additionally, the  type hint is used without being imported from the  module.
+
+Correction:
+Add the  keyword to the method definition and import  from .
+
+
+
+
+File: Chapter 17_ Reasoning Techniques (Executing code).ipynb
+
+Bug 1:
+The  list for the  is populated with the  class instead of an instance of the class. The  class expects a list of objects that inherit from .
+
+Correction:
+Instantiate the  tool before passing it to the agent.
+
+
+
+Bug 2:
+The  for the  is a list containing the  class, not an instance of the class. The  parameter expects a single  instance, not a list.
+
+Correction:
+Instantiate the  and pass it directly to the  parameter.
+
+
+
+
+File: Chapter 17_ Reasoning Techniques (Google DeepSearch).ipynb
+
+Bug:
+The code is incomplete and cannot be run as-is. The following components are missing:
+- The node functions (, , , ) are not defined.
+- The  TypedDict is not defined.
+- The  for the graph is not defined.
+- The conditional edge functions (, ) are not defined.
+- , , and  are not imported from .
+
+Correction:
+To make the code runnable, all the missing components must be defined and imported.
+
+
+
+
+File: Chapter 18_ Guardrails_Safety Patterns (ADK validate tool).ipynb
+
+Bug:
+The  function is defined, but it is not passed to the 's  parameter during initialization. As a result, the validation logic will never be executed.
+
+Correction:
+Pass the  function to the  parameter of the .
+
+
+
+
+File: Chapter 18_ Guardrails_Safety Patterns (LLM as a Guardrail).txt
+
+Bug:
+The file has a  extension, but its content is a Jupyter Notebook. This will cause parsing errors for any application trying to read it as a text file.
+
+Correction:
+Change the file extension to  to reflect its true format.
+
+
+
+File: Chapter 18_ Guardrails_Safety Patterns (Practical Code Examples for Guardrails).ipynb
+
+Bug:
+The code that sets the  and  environment variables is commented out, and there is no check to ensure these variables are set before they are used. This will lead to an error when the  or the  model is initialized.
+
+Correction:
+Uncomment the lines for setting the environment variables, or add a check to ensure they are set.
+
+
+
+
+File: Chapter 18_ Guardrails_Safety Patterns (Practical Code Examples for Guardrails) (1).ipynb
+
+Bug:
+The  class is imported from  but it is not used. The  class should be imported from  and used to instantiate the llm.
+
+Correction:
+Replace the  import with  and instantiate the llm with .
+
+
+
+
+File: Chapter 19_ Evaluation and Monitoring (LLM as a Judge).ipynb
+
+Bug:
+The  function uses  to parse the output of the LLM. However, there is no guarantee that the LLM will always return a valid JSON string. If the LLM returns a malformed JSON or a plain text string, the  call will raise a , crashing the program.
+
+Correction:
+Add a try-except block to handle potential  and return a specific error message or a default value.
+
+
+
+
+File: Chapter 2_ Routing (Google ADK Code Example).ipynb
+
+Bug:
+The  function is defined but never used. The  is instructed to delegate to an "unclear" agent, but no such agent is defined, and the  is not used in any tool.
+
+Correction:
+Create an  and a corresponding tool that uses the  function, and add it to the 's list of tools.
+
+
+
+
+File: Chapter 2_ Routing (LangGraph Code Example).ipynb
+
+Bug:
+The  is constructed with a list of tuples, but the last argument should be the default runnable, not a tuple. The  expects a series of (condition, runnable) tuples, followed by a final default runnable.
+
+Correction:
+Change the last argument to the  to be just the  runnable, without the condition.
+
+
+
+
+File: Chapter 2_ Routing (Openrouter example).ipynb
+
+Bug:
+The code uses placeholder values for , , and . These need to be replaced with actual values for the code to work.
+
+Correction:
+Replace the placeholder values with your actual OpenRouter API key and site information.
+
+
+
+
+File: Chapter 20_ Prioritization (SuperSimplePM).ipynb
+
+Bug 1:
+The  function is imported from , but it should be imported from .
+
+Correction:
+Change the import statement to .
+
+Bug 2:
+The  variable is created but not used. The  should be initialized with the  and .
+
+Correction:
+Pass the  and  to the  constructor.
+
+
+
+
+File: Chapter 21_ Chapter 21_ Exploration and Discovery(Agent Laboratory).ipynb
+
+Bug:
+The  function is called inside the  method of the  class, but it is not defined within the class or imported. This will result in a .
+
+Correction:
+Define the  function before the  class, or import it if it is defined in another module.
+
+
+
+
+File: Chapter 3_ Parallelization (Google ADK Code Example).ipynb
+
+Bug 1:
+The  and  are used without being imported.
+
+Correction:
+Add the following import statements at the beginning of the file:
+
+
+Bug 2:
+The  variable is used but not defined.
+
+Correction:
+Define the  variable with a valid Gemini model name.
+
+
+Bug 3:
+The  is used but not imported.
+
+Correction:
+Add the following import statement at the beginning of the file:
+
+
+
+File: Chapter 3_ Parallelization (LangChain Code Example).ipynb
+
+Bug:
+The  is used to pass the  to the , but it is redundant. The  already has access to the  from the input dictionary.
+
+Correction:
+Remove the  from the  definition.
+
+
+
+
+File: Chapter 4_ Reflection (LangChain Code Example).ipynb
+
+Bug:
+The  is used to pass both  and  to the . However, the  only accepts one input, . The  is not used in the 's prompt.
+
+Correction:
+Update the  prompt to accept both  and  as input.
+
+
+
+
+File: Chapter 5_ Tool Use (CrewAI Function Calling Example).ipynb
+
+Bug:
+The code that sets the  and  environment variables is commented out, and there is no check to ensure these variables are set before they are used. This will lead to an error when the  model is initialized.
+
+Correction:
+Uncomment the lines for setting the environment variables, or add a check to ensure they are set.
+
+
+
+
+File: Chapter 5_ Tool Use (Executing Code).ipynb
+
+Bug:
+The  parameter of the  is set to , which is a module, not a tool. The  parameter expects a list of  instances.
+
+Correction:
+Use the  tool from the  module.
+
+
+
+
+File: Chapter 5_ Tool Use (LangChain Code Example ).ipynb
+
+Bug:
+The  function is imported from , but it should be imported from .
+
+Correction:
+Change the import statement to .
+
+
+
+File: Chapter 5_ Tool Use (using Google Search).ipynb
+
+Bug:
+The  list for the  is populated with the  class instead of an instance of the class. The  class expects a list of objects that inherit from .
+
+Correction:
+Instantiate the  tool before passing it to the agent.
+
+
+
+
+File: Chapter 5_ Tool Use (Vertex AI Search).ipynb
+
+Bug:
+The code that sets the  environment variable is commented out, and there is no check to ensure this variable is set before it is used. This will lead to an error when the  is initialized.
+
+Correction:
+Uncomment the line for setting the environment variable, or add a check to ensure it is set.
+
+
+
+
+File: Chapter 6_ Planning - Code Example.ipynb
+
+Bug:
+The  function is called, but there is no check to ensure that the  is set. This will cause an error when the  model is initialized if the key is not in the  file or the environment.
+
+Correction:
+Add a check to ensure the API key is available after loading the .env file.
+
+
+
+
+File: Chapter 6_ Planning - Deep Research API Example.ipynb
+
+Bug:
+The code uses a placeholder value for the  in the  client. This will cause an authentication error when making a request to the API.
+
+Correction:
+Replace "YOUR_OPENAI_API_KEY" with a valid OpenAI API key.
+
+
+
+
+File: Chapter 7_ Multi-Agent Collaboration - Code Example (ADK + Gemini AgentTooll).ipynb
+
+Bug:
+The  function is passed to the  list of the  as a raw function. It should be wrapped in a .
+
+Correction:
+Wrap the  function in a  before passing it to the agent.
+
+
+
+
+File: Chapter 7_ Multi-Agent Collaboration - Code Example (ADK + Gemini Coordinator).ipynb
+
+Bug:
+The  list of the  agent contains the  class instead of an instance of the class. The  parameter expects a list of  instances.
+
+Correction:
+Instantiate the  before passing it to the  list.
+
+
+
+
+File: Chapter 7_ Multi-Agent Collaboration - Code Example (ADK + Gemini Sequential).ipynb
+
+Bug:
+The  class is initialized without a  parameter. The  (which is the default ) requires a  to be specified.
+
+Correction:
+Add a  parameter to the  initializations.
+
+
+
+
+File: Chapter 7_ Multi-Agent Collaboration - Code Example (CrewAI + Gemini).ipynb
+
+Bug:
+The  and  agents are initialized without an  parameter. While CrewAI can sometimes infer the LLM from the environment, it is best practice to explicitly pass the  to each agent to avoid ambiguity.
+
+Correction:
+Add the  parameter to the  initializations.
+
+
+
+
+File: Chapter 8_ Memory Management - Code Example (ADK MemoryService InMemory Example).ipynb
+
+Bug:
+The  variable is a placeholder and needs to be replaced with a valid Vertex AI RAG Corpus resource name for the code to be functional. The current value is .
+
+Correction:
+Replace the placeholder with a valid resource name.
+
+
+
+
+File: Chapter 8_ Memory Management - Code Example (ADK SessionService InMemory and Database).ipynb
+
+Bug:
+The third cell uses placeholder values for , , and . These need to be replaced with actual values for the code to work.
+
+Correction:
+Replace the placeholder values with your actual GCP project information.
+
+
+
+
+File: Chapter 8_ Memory Management - Code Example (LangChain and LangGraph).ipynb
+
+Bug 1:
+The  class is deprecated. The output shows a .
+
+Correction:
+Use  instead.
+
+Bug 2:
+The  class is deprecated. It should be replaced with  from .
+
+Correction:
+Replace  with  and  with .
+
+Bug 3:
+The  class is deprecated.
+
+Correction:
+Use the LangChain Expression Language (LCEL) to create a chain with memory.
+
+Bug 4:
+The  and  functions are deprecated. They should be replaced with  and .
+
+Correction:
+Use .
+
+
+
+File: Chapter 9_ Adaptation - Code Example (OpenEvolve).ipynb
+
+Bug 1:
+The code uses placeholder paths for , , and . These need to be replaced with actual file paths for the code to work.
+
+Correction:
+Replace the placeholder paths with valid file paths.
+
+Bug 2:
+The  keyword is used outside of an  function. This will cause a .
+
+Correction:
+Wrap the  call in an  function and run it with .
+
+
