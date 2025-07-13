@@ -2,6 +2,8 @@
 
 This repository contains the code examples for the book "21 Agentic Design Patterns: A Hands-On Guide to Building Intelligent Systems". It provides practical implementations of various agentic design patterns using modern AI frameworks and libraries.
 
+https://docs.google.com/document/d/1rsaK53T3Lg5KoGwvf8ukOUvbELRtH-V0LnOIFDxBryE/edit?tab=t.0#heading=h.pxcur8v2qagu
+
 ## About the Book
 
 "21 Agentic Design Patterns" is a comprehensive guide for developers, architects, and AI enthusiasts who want to learn how to build intelligent and autonomous systems. The book explores a wide range of patterns, from fundamental concepts like prompt chaining and tool use to advanced topics like multi-agent collaboration, reflection, and resource-aware optimization.
