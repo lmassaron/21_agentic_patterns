@@ -1,552 +1,807 @@
-File: Appendix C_.ipynb
+# Bug Report
 
-Bug 1:
-In the first code cell, the variables `prompt`, `model`, and `output_parser` are used without being defined, leading to a `NameError`.
-Correction:
-Define the variables before use. For example:
-```python
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
-from langchain_core.output_parsers import StrOutputParser
+This document details the bugs found in the project's Jupyter notebooks. Each entry includes a description of the bug, its importance, and a suggested fix.
 
-prompt = ChatPromptTemplate.from_template("Tell me a joke about {topic}")
-model = ChatOpenAI()
-output_parser = StrOutputParser()
+---
 
-chain = prompt | model | output_parser
-chain.invoke({"topic": "bears"})
-```
+### **File: Appendix C_.ipynb**
 
-Bug 2:
-In the second code cell, `TypedDict` is used without being imported, and the `llm` variable is used without being defined.
-Correction:
-Import `TypedDict` from the `typing` module and define the `llm` variable.
-```python
-from typing import TypedDict
-from langchain_openai import ChatOpenAI
+**Bug 1: Undefined Variables in Chaining Operation**
 
-llm = ChatOpenAI()
+*   **Description:** In the first code cell, the script attempts to create a chain by using the variables `prompt`, `model`, and `output_parser`. However, these variables are not defined anywhere before they are used, which will result in a `NameError` when the code is executed.
+*   **Importance:** This error prevents the entire code cell from running, making the example non-functional. It's a fundamental issue that needs to be addressed for the code to be testable and usable.
+*   **Suggested Fix:** To resolve this, you need to import the required classes (`ChatPromptTemplate`, `ChatOpenAI`, `StrOutputParser`) and instantiate the `prompt`, `model`, and `output_parser` variables before they are used to build the chain.
 
-class State(TypedDict):
-    topic: str
-    joke: str
-    story: str
-    poem: str
-    combined_output: str
+    ```python
+    from langchain_core.prompts import ChatPromptTemplate
+    from langchain_openai import ChatOpenAI
+    from langchain_core.output_parsers import StrOutputParser
 
-# ... rest of the code
-```
+    prompt = ChatPromptTemplate.from_template("Tell me a joke about {topic}")
+    model = ChatOpenAI()
+    output_parser = StrOutputParser()
 
+    chain = prompt | model | output_parser
+    chain.invoke({"topic": "bears"})
+    ```
 
-File: Chapter 1_ Prompt Chaining (Code Example).ipynb
+**Bug 2: Undefined `TypedDict` and `llm` Variable**
 
-Bug:
-The code relies on the  environment variable, but the lines to load it from a  file using  are commented out. If the user does not have this environment variable set globally, the program will fail with a .
+*   **Description:** In the second code cell, the code uses `TypedDict` without importing it from the `typing` module, and it references a variable `llm` that has not been defined. This will lead to two separate `NameError` exceptions.
+*   **Importance:** These errors make the code cell unrunnable. For the example to work, all types and variables must be properly defined.
+*   **Suggested Fix:** Add an import statement for `TypedDict` from the `typing` module and define the `llm` variable, for example, by instantiating `ChatOpenAI`.
 
-Correction:
-Uncomment the lines for loading the environment variable to make the example more robust and self-contained.
+    ```python
+    from typing import TypedDict
+    from langchain_openai import ChatOpenAI
 
+    llm = ChatOpenAI()
 
+    class State(TypedDict):
+        topic: str
+        joke: str
+        story: str
+        poem: str
+        combined_output: str
 
+    # ... rest of the code
+    ```
 
-File: Chapter 10_ Model Context Protocol (agent.py for MCP Filesystem Example).ipynb
+---
 
-Bug:
-The code uses  to get the path of the current script. This variable is not defined in a Jupyter Notebook environment, which will cause a  when the cell is executed.
+### **File: Chapter 1_ Prompt Chaining (Code Example).ipynb**
 
-Correction:
-Replace  with a hardcoded path or a more suitable method for getting the current working directory in a notebook, such as .
+**Bug: Environment Variable Loading is Commented Out**
 
+*   **Description:** The code relies on an API key that should be loaded as an environment variable. The lines responsible for loading this variable from a `.env` file using `dotenv` are commented out.
+*   **Importance:** If a user does not have the required environment variable set globally, the program will fail with an authentication error. This makes the example less portable and harder for others to run without modification.
+*   **Suggested Fix:** Uncomment the following lines at the beginning of the script to make the example more robust and self-contained.
 
+    ```python
+    # from dotenv import load_dotenv
+    # load_dotenv()
+    ```
+    should be changed to:
+    ```python
+    from dotenv import load_dotenv
+    load_dotenv()
+    ```
 
+---
 
-File: Chapter 11_ Goal Setting and Monitoring (Goal_Setting_Iteration).ipynb
+### **File: Chapter 10_ Model Context Protocol (agent.py for MCP Filesystem Example).ipynb**
 
-Bug:
-The first cell uses  to install dependencies. While this works in a notebook, it does not persist the dependencies in a  file, making it harder for others to replicate the environment.
+**Bug: Use of `__file__` in a Jupyter Notebook Environment**
 
-Correction:
-Create a  file and list the dependencies there. Then, instruct the user to install the dependencies from the file using .
+*   **Description:** The code uses the `__file__` attribute to determine the path of the current script. This attribute is not defined in Jupyter Notebook environments.
+*   **Importance:** Executing this code in a Jupyter Notebook will raise a `NameError`, preventing the script from running.
+*   **Suggested Fix:** Replace `__file__` with a more reliable method for path discovery in a notebook, such as `os.getcwd()`, or use a hardcoded absolute path if the file location is fixed.
 
- content:
+    ```python
+    import os
+    # Instead of:
+    # current_dir = os.path.dirname(os.path.abspath(__file__))
+    # Use:
+    current_dir = os.getcwd()
+    ```
 
+---
 
+### **File: Chapter 11_ Goal Setting and Monitoring (Goal_Setting_Iteration).ipynb**
 
-File: Chapter 12_ Exception Handling and Recovery (Agent with Fallback).ipynb
+**Bug: In-Notebook Dependency Installation**
 
-Bug:
-The tools  and  are used when creating the  and  agents, but they are never defined. This will result in a  when the code is executed.
+*   **Description:** The first cell uses `pip install` to install the required dependencies directly within the notebook.
+*   **Importance:** While this approach works for a single user, it is not a good practice for reproducibility. It does not create a `requirements.txt` file, making it difficult for other users to set up the same environment.
+*   **Suggested Fix:** For better project structure and reproducibility, create a `requirements.txt` file listing all dependencies. Then, instruct users to install them from the command line using `pip install -r requirements.txt`.
 
-Correction:
-Define the tool functions before they are used in the agent definitions.
+    **`requirements.txt` content:**
+    ```
+    # Add all necessary packages here, for example:
+    # langchain
+    # openai
+    ```
 
+---
 
+### **File: Chapter 12_ Exception Handling and Recovery (Agent with Fallback).ipynb**
 
+**Bug: Undefined Tool Functions**
 
-File: Chapter 13_ Human-in-the-Loop (Customer Support Agent with Personalization and Escalation).ipynb
+*   **Description:** The `search_tool` and `another_tool` are used to create the `researcher_agent` and `fallback_agent`, but these functions are never defined.
+*   **Importance:** This will cause a `NameError` when the code is executed, preventing the agents from being created.
+*   **Suggested Fix:** Define the `search_tool` and `another_tool` functions before they are used. These can be simple placeholder functions if the goal is just to demonstrate the fallback mechanism.
+
+    ```python
+    from langchain.tools import tool
+
+    @tool
+    def search_tool(query: str) -> str:
+        """A dummy search tool."""
+        return f"Search results for: {query}"
+
+    @tool
+    def another_tool(query: str) -> str:
+        """Another dummy tool."""
+        return f"Another tool's result for: {query}"
+    ```
 
-Bug:
-The  list for the  is populated with raw function objects (, , ) instead of  instances. The  class expects a list of objects that inherit from .
+---
 
-Correction:
-Wrap each tool function in a  before passing them to the agent.
+### **File: Chapter 13_ Human-in-the-Loop (Customer Support Agent with Personalization and Escalation).ipynb**
 
+**Bug: Raw Functions Passed to Agent's Tool List**
+
+*   **Description:** The `tools` list for the `customer_support_agent` is populated with raw function objects (`search_knowledge_base`, `escalate_to_human`, `personalize_response`) instead of `Tool` instances. The agent framework expects a list of objects that inherit from a base `Tool` class.
+*   **Importance:** The agent will not be able to correctly identify or execute the tools, leading to runtime errors and preventing the agent from functioning as intended.
+*   **Suggested Fix:** Wrap each tool function in a `Tool` object before adding it to the agent's `tools` list. This provides the necessary metadata for the agent to use the tools.
 
+    ```python
+    from langchain.tools import Tool
 
+    tools = [
+        Tool(
+            name="search_knowledge_base",
+            func=search_knowledge_base,
+            description="Searches the knowledge base for an answer.",
+        ),
+        Tool(
+            name="escalate_to_human",
+            func=escalate_to_human,
+            description="Escalates the issue to a human agent.",
+        ),
+        Tool(
+            name="personalize_response",
+            func=personalize_response,
+            description="Personalizes the response for the user.",
+        ),
+    ]
+    ```
 
-File: Chapter 14_ Knowledge Retrieval (RAG LangChain).ipynb
+---
 
-Bug 1:
-The URL used to download the  file points to the GitHub HTML page, not the raw file content. This will result in saving HTML tags and other markup in the text file, which will negatively affect the RAG pipeline.
+### **File: Chapter 14_ Knowledge Retrieval (RAG LangChain).ipynb**
 
-Correction:
-Change the URL to point to the raw version of the file.
+**Bug 1: Incorrect URL for Raw File Content**
 
+*   **Description:** The URL used to download the `state_of_the_union.txt` file points to the GitHub HTML page, not the raw file content.
+*   **Importance:** This will cause the downloaded file to be filled with HTML tags and other markup instead of plain text. This corrupted data will negatively impact the RAG pipeline's performance and lead to inaccurate results.
+*   **Suggested Fix:** Change the URL to point to the raw version of the file on GitHub.
 
+    ```python
+    # Incorrect URL:
+    # url = "https://github.com/langchain-ai/langchain/blob/master/docs/docs/modules/state_of_the_union.txt"
+    # Correct URL:
+    url = "https://raw.githubusercontent.com/langchain-ai/langchain/master/docs/docs/modules/state_of_the_union.txt"
+    ```
 
-Bug 2:
-The code loads environment variables using  but does not validate that the  is actually present. This can lead to a  later in the code when the OpenAI API is called.
+**Bug 2: Missing API Key Validation**
 
-Correction:
-Add a check to ensure the API key is available after loading the .env file.
+*   **Description:** The code loads environment variables using `dotenv` but does not validate that the `OPENAI_API_KEY` is actually present before it is used.
+*   **Importance:** If the API key is not found in the `.env` file or the environment, the program will crash later with an authentication error when an OpenAI API call is made. This can be difficult to debug.
+*   **Suggested Fix:** Add a check to ensure the API key is available immediately after loading the `.env` file.
 
+    ```python
+    import os
+    from dotenv import load_dotenv
 
+    load_dotenv()
+    if "OPENAI_API_KEY" not in os.environ:
+        raise ValueError("OPENAI_API_KEY not found in .env file or environment variables.")
+    ```
 
+---
 
-File: Chapter 14_ Knowledge Retrieval (RAG Google Search).ipynb
+### **File: Chapter 14_ Knowledge Retrieval (RAG Google Search).ipynb**
 
-Bug:
-The  list for the  is populated with the  class instead of an instance of the class. The  class expects a list of objects that inherit from .
+**Bug: Passing a Class Instead of an Instance to the Tool List**
 
-Correction:
-Instantiate the  tool before passing it to the agent.
+*   **Description:** The `tools` list for the `agent` is populated with the `GoogleSearchAPIWrapper` class itself, not an instance of the class. The agent framework expects a list of instantiated tool objects.
+*   **Importance:** This will result in a `TypeError` or an attribute error at runtime because the agent will try to call methods on a class instead of an object.
+*   **Suggested Fix:** Instantiate the `GoogleSearchAPIWrapper` tool before passing it to the agent's `tools` list.
 
+    ```python
+    from langchain_community.utilities import GoogleSearchAPIWrapper
 
+    # Incorrect:
+    # tools = [GoogleSearchAPIWrapper]
+    # Correct:
+    search = GoogleSearchAPIWrapper()
+    tools = [
+        Tool(
+            name="google_search",
+            description="Search Google for recent results.",
+            func=search.run,
+        )
+    ]
+    ```
 
+---
 
-File: Chapter 14_ Knowledge Retrieval (RAG VertexAI).ipynb
+### **File: Chapter 14_ Knowledge Retrieval (RAG VertexAI).ipynb**
 
-Bug:
-The  variable is a placeholder and needs to be replaced with a valid Vertex AI RAG Corpus resource name for the code to be functional. The current value is .
+**Bug: Placeholder Value for RAG Corpus Resource Name**
 
-Correction:
-Replace the placeholder with a valid resource name.
+*   **Description:** The `rag_corpus_resource_name` variable is assigned a placeholder value (`"YOUR_RAG_CORPUS_RESOURCE_NAME"`).
+*   **Importance:** This placeholder makes the code non-functional. To connect to the Vertex AI RAG service, a valid corpus resource name is required.
+*   **Suggested Fix:** Replace the placeholder string with a valid Vertex AI RAG Corpus resource name from your Google Cloud project.
 
+    ```python
+    # Incorrect:
+    # rag_corpus_resource_name = "YOUR_RAG_CORPUS_RESOURCE_NAME"
+    # Correct (example):
+    rag_corpus_resource_name = "projects/your-gcp-project-id/locations/us-central1/ragCorpora/your-corpus-id"
+    ```
 
+---
 
+### **File: Chapter 15_ Inter-Agent Communication (A2A).ipynb**
 
-File: Chapter 15_ Inter-Agent Communication (A2A).ipynb
+**Bug: `AgentTool` Initialized Without Required Arguments**
 
-Bug:
-The  is initialized without any arguments. The constructor for  requires a  and .
+*   **Description:** The `AgentTool` is initialized without any arguments. The constructor for this class requires `name` and `description` to be provided.
+*   **Importance:** This will raise a `TypeError` at initialization, preventing the tool from being created and the agent from being defined.
+*   **Suggested Fix:** Provide a `name` and `description` when initializing the `AgentTool`.
 
-Correction:
-Provide a name and description when initializing the .
+    ```python
+    from adk.tools import AgentTool
 
+    # Incorrect:
+    # weather_agent_tool = AgentTool()
+    # Correct:
+    weather_agent_tool = AgentTool(
+        name="WeatherAgentTool",
+        description="A tool to get weather forecasts.",
+        agent=weather_agent, # Assuming weather_agent is defined
+    )
+    ```
 
+---
 
+### **File: Chapter 15_ Inter-Agent Communication (Synchronous and Streaming Requests).json**
 
-File: Chapter 15_ Inter-Agent Communication (Synchronous and Streaming Requests).json
+**Bug: Incorrect File Extension**
 
-Bug:
-The file has a  extension, but its content is a Jupyter Notebook with comments, not a valid JSON object. This will cause parsing errors for any application trying to read it as a JSON file.
+*   **Description:** The file has a `.json` extension, but its content is a Jupyter Notebook with Python code and comments, not a valid JSON object.
+*   **Importance:** This will cause parsing errors for any application or tool that tries to read it as a JSON file. It is also misleading to developers.
+*   **Suggested Fix:** Either change the file extension to `.ipynb` to accurately reflect its format or extract the JSON-like objects into a separate, valid `.json` file.
 
-Correction:
-Either change the file extension to  to reflect its true format, or extract the JSON objects into a valid  file.
+---
 
-To make it a valid JSON file, the content should be:
+### **File: Chapter 16_ Resource-Aware Optimization (code snippets).ipynb**
 
+**Bug: Missing `self` in Method Definition and `Optional` Not Imported**
 
+*   **Description:** In the second cell, the `process` method of the `DataProcessor` class is defined without the `self` keyword as its first argument. Additionally, the `Optional` type hint is used without being imported from the `typing` module.
+*   **Importance:** The missing `self` will cause a `TypeError` when the method is called on an instance of the class. The unimported `Optional` will cause a `NameError`.
+*   **Suggested Fix:** Add the `self` keyword to the method definition and import `Optional` from the `typing` module.
 
-File: Chapter 16_ Resource-Aware Optimization (code snippets).ipynb
+    ```python
+    from typing import Optional
 
-Bug:
-In the second cell, the  method of the  class is defined without the  keyword, which will cause a . Additionally, the  type hint is used without being imported from the  module.
+    class DataProcessor:
+        # Incorrect: def process(data: str) -> Optional[str]:
+        # Correct:
+        def process(self, data: str) -> Optional[str]:
+            if not data:
+                return None
+            return data.upper()
+    ```
 
-Correction:
-Add the  keyword to the method definition and import  from .
+---
 
+### **File: Chapter 17_ Reasoning Techniques (Executing code).ipynb**
 
+**Bug 1: Passing a Class Instead of an Instance to the Tool List**
 
+*   **Description:** The `tools` list for the `agent` is populated with the `CodeInterpreterTool` class, not an instance of it.
+*   **Importance:** The agent framework expects a list of tool objects, so this will cause a `TypeError` or a similar error at runtime.
+*   **Suggested Fix:** Instantiate the `CodeInterpreterTool` before adding it to the `tools` list.
 
-File: Chapter 17_ Reasoning Techniques (Executing code).ipynb
+    ```python
+    from adk.tools import CodeInterpreterTool
 
-Bug 1:
-The  list for the  is populated with the  class instead of an instance of the class. The  class expects a list of objects that inherit from .
+    # Incorrect:
+    # tools = [CodeInterpreterTool]
+    # Correct:
+    tools = [CodeInterpreterTool()]
+    ```
 
-Correction:
-Instantiate the  tool before passing it to the agent.
+**Bug 2: Passing a List to `code_interpreter` Parameter**
 
+*   **Description:** The `code_interpreter` parameter for the `CodeInterpreter` is expecting a single `CodeInterpreterTool` instance but is being passed a list containing the class.
+*   **Importance:** This will result in a `TypeError` because the parameter type is incorrect.
+*   **Suggested Fix:** Instantiate the `CodeInterpreterTool` and pass the instance directly to the `code_interpreter` parameter, not in a list.
 
+    ```python
+    from adk.tools import CodeInterpreterTool
+    from adk.interpreters import CodeInterpreter
 
-Bug 2:
-The  for the  is a list containing the  class, not an instance of the class. The  parameter expects a single  instance, not a list.
+    # Incorrect:
+    # interpreter = CodeInterpreter(code_interpreter=[CodeInterpreterTool])
+    # Correct:
+    interpreter = CodeInterpreter(code_interpreter=CodeInterpreterTool())
+    ```
 
-Correction:
-Instantiate the  and pass it directly to the  parameter.
+---
 
+### **File: Chapter 17_ Reasoning Techniques (Google DeepSearch).ipynb**
 
+**Bug: Incomplete and Unrunnable Code**
 
+*   **Description:** The code in this notebook is incomplete and cannot be run as-is. Several key components are missing, including the definitions for node functions (`researcher`, `search`, `writer`, `reviser`), the `State` `TypedDict`, the `graph` object, conditional edge functions (`should_continue`, `should_revise`), and necessary imports from `langgraph.graph`.
+*   **Importance:** The example is not functional and serves only as a disconnected snippet. Users cannot run or learn from it without significant effort to fill in the missing pieces.
+*   **Suggested Fix:** To make the code runnable, all the missing components must be fully defined and imported. This includes implementing the logic for each node and edge in the graph.
 
-File: Chapter 17_ Reasoning Techniques (Google DeepSearch).ipynb
+---
 
-Bug:
-The code is incomplete and cannot be run as-is. The following components are missing:
-- The node functions (, , , ) are not defined.
-- The  TypedDict is not defined.
-- The  for the graph is not defined.
-- The conditional edge functions (, ) are not defined.
-- , , and  are not imported from .
+### **File: Chapter 18_ Guardrails_Safety Patterns (ADK validate tool).ipynb**
 
-Correction:
-To make the code runnable, all the missing components must be defined and imported.
+**Bug: Validation Function is Defined but Not Used**
 
+*   **Description:** The `validate_tool_call` function is defined to act as a guardrail, but it is not passed to the `LlmAgent`'s `validate_tool_call` parameter during initialization.
+*   **Importance:** As a result, the validation logic will never be executed. The safety guardrail is inactive, and the agent will process tool calls without any of the intended checks.
+*   **Suggested Fix:** Pass the `validate_tool_call` function to the `LlmAgent`'s constructor.
 
+    ```python
+    # Incorrect:
+    # agent = LlmAgent(llm=llm, tools=tools)
+    # Correct:
+    agent = LlmAgent(
+        llm=llm,
+        tools=tools,
+        validate_tool_call=validate_tool_call,
+    )
+    ```
 
+---
 
-File: Chapter 18_ Guardrails_Safety Patterns (ADK validate tool).ipynb
+### **File: Chapter 18_ Guardrails_Safety Patterns (LLM as a Guardrail).txt**
 
-Bug:
-The  function is defined, but it is not passed to the 's  parameter during initialization. As a result, the validation logic will never be executed.
+**Bug: Incorrect File Extension**
 
-Correction:
-Pass the  function to the  parameter of the .
+*   **Description:** The file has a `.txt` extension, but its content is a Jupyter Notebook.
+*   **Importance:** This is misleading and will cause parsing errors for any application that expects a plain text file.
+*   **Suggested Fix:** Rename the file to have an `.ipynb` extension to match its content.
 
+---
 
+### **File: Chapter 18_ Guardrails_Safety Patterns (Practical Code Examples for Guardrails).ipynb**
 
+**Bug: Environment Variable Setup is Commented Out**
 
-File: Chapter 18_ Guardrails_Safety Patterns (LLM as a Guardrail).txt
+*   **Description:** The code that sets the `OPENAI_API_KEY` and `TAVILY_API_KEY` environment variables is commented out, and there is no check to ensure these variables are set before they are used.
+*   **Importance:** This will lead to an authentication error when the `ChatOpenAI` or the `TavilySearchResults` tool is initialized if the keys are not already present in the environment.
+*   **Suggested Fix:** Uncomment the lines for setting the environment variables, or add a check to ensure they are set before use.
 
-Bug:
-The file has a  extension, but its content is a Jupyter Notebook. This will cause parsing errors for any application trying to read it as a text file.
+    ```python
+    # Uncomment these lines:
+    # os.environ["OPENAI_API_KEY"] = "YOUR_OPENAI_API_KEY"
+    # os.environ["TAVILY_API_KEY"] = "YOUR_TAVILY_API_KEY"
+    ```
 
-Correction:
-Change the file extension to  to reflect its true format.
+---
 
+### **File: Chapter 18_ Guardrails_Safety Patterns (Practical Code Examples for Guardrails) (1).ipynb**
 
+**Bug: Incorrect Import for `ChatOpenAI`**
 
-File: Chapter 18_ Guardrails_Safety Patterns (Practical Code Examples for Guardrails).ipynb
+*   **Description:** The `ChatOpenAI` class is imported from `langchain.chat_models`, which is an outdated path. It should be imported from `langchain_openai`.
+*   **Importance:** This will cause an `ImportError` in recent versions of LangChain, preventing the LLM from being instantiated.
+*   **Suggested Fix:** Correct the import statement to use the `langchain_openai` package.
 
-Bug:
-The code that sets the  and  environment variables is commented out, and there is no check to ensure these variables are set before they are used. This will lead to an error when the  or the  model is initialized.
+    ```python
+    # Incorrect:
+    # from langchain.chat_models import ChatOpenAI
+    # Correct:
+    from langchain_openai import ChatOpenAI
+    ```
 
-Correction:
-Uncomment the lines for setting the environment variables, or add a check to ensure they are set.
+---
 
+### **File: Chapter 19_ Evaluation and Monitoring (LLM as a Judge).ipynb**
 
+**Bug: No Error Handling for JSON Parsing**
 
+*   **Description:** The `parse_evaluation` function uses `json.loads` to parse the output of the LLM. However, there is no guarantee that the LLM will always return a valid JSON string.
+*   **Importance:** If the LLM returns a malformed JSON or a plain text string (e.g., an apology or a refusal to answer), the `json.loads` call will raise a `JSONDecodeError`, crashing the program.
+*   **Suggested Fix:** Add a `try-except` block to handle a potential `JSONDecodeError` and return a specific error message or a default value.
 
-File: Chapter 18_ Guardrails_Safety Patterns (Practical Code Examples for Guardrails) (1).ipynb
+    ```python
+    import json
 
-Bug:
-The  class is imported from  but it is not used. The  class should be imported from  and used to instantiate the llm.
+    def parse_evaluation(evaluation_string: str):
+        try:
+            return json.loads(evaluation_string)
+        except json.JSONDecodeError:
+            return {"error": "Invalid JSON format from LLM", "original_text": evaluation_string}
+    ```
 
-Correction:
-Replace the  import with  and instantiate the llm with .
+---
 
+### **File: Chapter 2_ Routing (Google ADK Code Example).ipynb**
 
+**Bug: Unused `unclear_agent_tool` Function**
 
+*   **Description:** The `unclear_agent_tool` function is defined but is never used. The `Router` is instructed to delegate to an "unclear" agent, but no such agent is defined, and the function is not attached to any tool.
+*   **Importance:** This represents dead code and an incomplete example. The routing logic described in the notebook is not fully implemented, which can be confusing for the user.
+*   **Suggested Fix:** To complete the example, create an `LlmAgent` and a corresponding `AgentTool` that uses the `unclear_agent_tool` function. Then, add this new tool to the `Router`'s list of tools.
 
-File: Chapter 19_ Evaluation and Monitoring (LLM as a Judge).ipynb
+---
 
-Bug:
-The  function uses  to parse the output of the LLM. However, there is no guarantee that the LLM will always return a valid JSON string. If the LLM returns a malformed JSON or a plain text string, the  call will raise a , crashing the program.
+### **File: Chapter 2_ Routing (LangGraph Code Example).ipynb**
 
-Correction:
-Add a try-except block to handle potential  and return a specific error message or a default value.
+**Bug: Incorrect `Router` Construction**
 
+*   **Description:** The `Router` is constructed with a list of tuples, but the final argument should be the default runnable, not a tuple containing a condition. The `Router` expects a series of `(condition, runnable)` tuples, followed by a single default runnable.
+*   **Importance:** This will cause a `TypeError` when constructing the router, as the arguments do not match the expected signature.
+*   **Suggested Fix:** Change the last argument to the `Router` to be just the `search_agent` runnable, without the conditional function.
 
+    ```python
+    # Incorrect:
+    # ... ("search", search_agent))
+    # Correct:
+    # ... search_agent)
+    ```
 
+---
 
-File: Chapter 2_ Routing (Google ADK Code Example).ipynb
+### **File: Chapter 2_ Routing (Openrouter example).ipynb**
 
-Bug:
-The  function is defined but never used. The  is instructed to delegate to an "unclear" agent, but no such agent is defined, and the  is not used in any tool.
+**Bug: Placeholder Values for API Key and Site Information**
 
-Correction:
-Create an  and a corresponding tool that uses the  function, and add it to the 's list of tools.
+*   **Description:** The code uses placeholder values for `OPENROUTER_API_KEY`, `YOUR_SITE_URL`, and `YOUR_APP_NAME`.
+*   **Importance:** These placeholders make the code non-functional. It will fail with authentication or configuration errors.
+*   **Suggested Fix:** Replace the placeholder values with your actual OpenRouter API key and site information.
 
+---
 
+### **File: Chapter 20_ Prioritization (SuperSimplePM).ipynb**
 
+**Bug 1: Incorrect Import for `create_react_agent`**
 
-File: Chapter 2_ Routing (LangGraph Code Example).ipynb
+*   **Description:** The `create_react_agent` function is imported from `langchain.agents.react.agent`, but this path is incorrect.
+*   **Importance:** This will cause an `ImportError`, preventing the agent from being created.
+*   **Suggested Fix:** The correct import path for this function is typically from `langchain.agents`. However, with recent updates, you should verify the exact location from the LangChain documentation. A likely correction is to use a different agent creation method if this one is deprecated.
 
-Bug:
-The  is constructed with a list of tuples, but the last argument should be the default runnable, not a tuple. The  expects a series of (condition, runnable) tuples, followed by a final default runnable.
+**Bug 2: Unused `llm` Variable**
 
-Correction:
-Change the last argument to the  to be just the  runnable, without the condition.
+*   **Description:** The `llm` variable is created by instantiating `ChatOpenAI`, but it is never passed to the `create_react_agent` function.
+*   **Importance:** The agent will be created without an LLM to power it, which will cause an error when the agent is run.
+*   **Suggested Fix:** Pass the `llm` and `tools` to the `create_react_agent` constructor.
 
+    ```python
+    # agent = create_react_agent(prompt)
+    # Correct:
+    # agent = create_react_agent(llm=llm, tools=tools, prompt=prompt)
+    ```
 
+---
 
+### **File: Chapter 21_ Chapter 21_ Exploration and Discovery(Agent Laboratory).ipynb**
 
-File: Chapter 2_ Routing (Openrouter example).ipynb
+**Bug: Undefined `get_tools` Function**
 
-Bug:
-The code uses placeholder values for , , and . These need to be replaced with actual values for the code to work.
+*   **Description:** The `get_tools` function is called inside the `run_experiment` method of the `AgentExperiment` class, but it is not defined within the class or imported from another module.
+*   **Importance:** This will result in a `NameError` when `run_experiment` is called.
+*   **Suggested Fix:** Define the `get_tools` function before the `AgentExperiment` class is defined, or import it if it exists in another module.
 
-Correction:
-Replace the placeholder values with your actual OpenRouter API key and site information.
+    ```python
+    def get_tools(tool_names: list[str]):
+        # Implementation to fetch/define tools based on names
+        pass
 
+    class AgentExperiment:
+        # ...
+    ```
 
+---
 
+### **File: Chapter 3_ Parallelization (Google ADK Code Example).ipynb**
 
-File: Chapter 20_ Prioritization (SuperSimplePM).ipynb
+**Bug 1: Missing Imports for `Llm`, `Prompt`**
 
-Bug 1:
-The  function is imported from , but it should be imported from .
+*   **Description:** The `Llm` and `Prompt` classes are used to define agents and prompts, but they are not imported.
+*   **Importance:** This will cause a `NameError`.
+*   **Suggested Fix:** Add the following import statements at the beginning of the file:
 
-Correction:
-Change the import statement to .
+    ```python
+    from adk.llm import Llm
+    from adk.prompt import Prompt
+    ```
 
-Bug 2:
-The  variable is created but not used. The  should be initialized with the  and .
+**Bug 2: Undefined `gemini_model` Variable**
 
-Correction:
-Pass the  and  to the  constructor.
+*   **Description:** The `gemini_model` variable is used when creating `Llm` instances, but it is never defined.
+*   **Importance:** This will cause a `NameError`.
+*   **Suggested Fix:** Define the `gemini_model` variable with a valid Gemini model name before it is used.
 
+    ```python
+    gemini_model = "gemini-1.5-flash"
+    ```
 
+**Bug 3: Missing Import for `Parallel`**
 
+*   **Description:** The `Parallel` class is used to construct a parallel flow, but it is not imported.
+*   **Importance:** This will cause a `NameError`.
+*   **Suggested Fix:** Add the following import statement at the beginning of the file:
 
-File: Chapter 21_ Chapter 21_ Exploration and Discovery(Agent Laboratory).ipynb
+    ```python
+    from adk.core import Parallel
+    ```
 
-Bug:
-The  function is called inside the  method of the  class, but it is not defined within the class or imported. This will result in a .
+---
 
-Correction:
-Define the  function before the  class, or import it if it is defined in another module.
+### **File: Chapter 3_ Parallelization (LangChain Code Example).ipynb**
 
+**Bug: Redundant `RunnablePassthrough`**
 
+*   **Description:** The `RunnablePassthrough` is used to pass the `topic` to the `poem_chain`, but the `topic` is already present in the input dictionary that is passed to the entire chain.
+*   **Importance:** This makes the code unnecessarily complex and harder to read. While it works, it is not an idiomatic use of LCEL.
+*   **Suggested Fix:** Remove the redundant `RunnablePassthrough.assign(topic=...` from the `map_chain` definition. The `poem_chain` will automatically receive the `topic` from the main input.
 
+---
 
-File: Chapter 3_ Parallelization (Google ADK Code Example).ipynb
+### **File: Chapter 4_ Reflection (LangChain Code Example).ipynb**
 
-Bug 1:
-The  and  are used without being imported.
+**Bug: `RunnableParallel` Passes Unused Input to a Chain**
 
-Correction:
-Add the following import statements at the beginning of the file:
+*   **Description:** The `RunnableParallel` is configured to pass both `topic` and `reflection` to the `reflection_chain`. However, the prompt for the `reflection_chain` only accepts one input, `topic`. The `reflection` input is not used.
+*   **Importance:** The reflection logic is flawed. The `reflection` generated in the previous step is ignored, and the reflection chain does not perform its intended function of refining the output based on the reflection.
+*   **Suggested Fix:** Update the `reflection_prompt` to accept both `topic` and `reflection` as input variables.
 
+    ```python
+    reflection_prompt = ChatPromptTemplate.from_template(
+        "You are a senior writer. Your job is to take a topic and a reflection on a previous attempt and generate a new, improved response.
+"
+        "Topic: {topic}
+"
+        "Reflection: {reflection}"
+    )
+    ```
 
-Bug 2:
-The  variable is used but not defined.
+---
 
-Correction:
-Define the  variable with a valid Gemini model name.
+### **File: Chapter 5_ Tool Use (CrewAI Function Calling Example).ipynb**
 
+**Bug: Environment Variable Setup is Commented Out**
 
-Bug 3:
-The  is used but not imported.
+*   **Description:** The code that sets the `OPENAI_API_KEY` and `SERPER_API_KEY` environment variables is commented out.
+*   **Importance:** If these keys are not set in the user's global environment, the code will fail with an authentication error when the `ChatOpenAI` model or the search tool is initialized.
+*   **Suggested Fix:** Uncomment the lines for setting the environment variables, or add a check to ensure they are set before use.
 
-Correction:
-Add the following import statement at the beginning of the file:
+---
 
+### **File: Chapter 5_ Tool Use (Executing Code).ipynb**
 
+**Bug: Passing a Module Instead of a Tool Instance**
 
-File: Chapter 3_ Parallelization (LangChain Code Example).ipynb
+*   **Description:** The `tools` parameter of the `LlmAgent` is set to `[code_interpreter_tool]`, where `code_interpreter_tool` is a module, not a `Tool` instance. The agent's `tools` parameter expects a list of instantiated `Tool` objects.
+*   **Importance:** This will cause a `TypeError` or a similar error because the agent cannot work with a module.
+*   **Suggested Fix:** Use the `CodeInterpreterTool` class from the `adk.tools` module to create a tool instance.
 
-Bug:
-The  is used to pass the  to the , but it is redundant. The  already has access to the  from the input dictionary.
+    ```python
+    from adk.tools import CodeInterpreterTool
+    tools = [CodeInterpreterTool()]
+    ```
 
-Correction:
-Remove the  from the  definition.
+---
 
+### **File: Chapter 5_ Tool Use (LangChain Code Example ).ipynb**
 
+**Bug: Incorrect Import for `DuckDuckGoSearchRun`**
 
+*   **Description:** The `DuckDuckGoSearchRun` tool is imported from `langchain_community.tools.ddg_search.tool`, which is incorrect.
+*   **Importance:** This will cause an `ImportError`.
+*   **Suggested Fix:** Correct the import statement. The tool is usually available directly from `langchain_community.tools`.
 
-File: Chapter 4_ Reflection (LangChain Code Example).ipynb
+    ```python
+    # Incorrect:
+    # from langchain_community.tools.ddg_search.tool import DuckDuckGoSearchRun
+    # Correct:
+    from langchain_community.tools import DuckDuckGoSearchRun
+    ```
 
-Bug:
-The  is used to pass both  and  to the . However, the  only accepts one input, . The  is not used in the 's prompt.
+---
 
-Correction:
-Update the  prompt to accept both  and  as input.
+### **File: Chapter 5_ Tool Use (using Google Search).ipynb**
 
+**Bug: Passing a Class Instead of an Instance to the Tool List**
 
+*   **Description:** The `tools` list for the `agent` is populated with the `GoogleSearchRun` class, not an instance of it.
+*   **Importance:** The agent framework expects a list of tool objects, so this will cause a `TypeError` at runtime.
+*   **Suggested Fix:** Instantiate the `GoogleSearchRun` tool before passing it to the agent's `tools` list.
 
+    ```python
+    from langchain_community.tools import GoogleSearchRun
 
-File: Chapter 5_ Tool Use (CrewAI Function Calling Example).ipynb
+    # Incorrect:
+    # tools = [GoogleSearchRun]
+    # Correct:
+    tools = [GoogleSearchRun()]
+    ```
 
-Bug:
-The code that sets the  and  environment variables is commented out, and there is no check to ensure these variables are set before they are used. This will lead to an error when the  model is initialized.
+---
 
-Correction:
-Uncomment the lines for setting the environment variables, or add a check to ensure they are set.
+### **File: Chapter 5_ Tool Use (Vertex AI Search).ipynb**
 
+**Bug: Environment Variable Setup is Commented Out**
 
+*   **Description:** The code that sets the `GOOGLE_APPLICATION_CREDENTIALS` environment variable is commented out.
+*   **Importance:** This will lead to an authentication error when the `VertexAISearch` tool is initialized if the variable is not already set in the environment.
+*   **Suggested Fix:** Uncomment the line for setting the environment variable, or add a check to ensure it is set.
 
+---
 
-File: Chapter 5_ Tool Use (Executing Code).ipynb
+### **File: Chapter 6_ Planning - Code Example.ipynb**
 
-Bug:
-The  parameter of the  is set to , which is a module, not a tool. The  parameter expects a list of  instances.
+**Bug: No Validation for `OPENAI_API_KEY`**
 
-Correction:
-Use the  tool from the  module.
+*   **Description:** The code calls `load_dotenv()` but does not check to ensure that the `OPENAI_API_KEY` is actually set in the environment.
+*   **Importance:** If the key is missing, the program will crash later with an authentication error when the `ChatOpenAI` model is initialized, which can be confusing to debug.
+*   **Suggested Fix:** Add a check to ensure the API key is available after loading the `.env` file.
 
+    ```python
+    import os
+    if "OPENAI_API_KEY" not in os.environ:
+        raise ValueError("OPENAI_API_KEY not found in .env file or environment variables.")
+    ```
 
+---
 
+### **File: Chapter 6_ Planning - Deep Research API Example.ipynb**
 
-File: Chapter 5_ Tool Use (LangChain Code Example ).ipynb
+**Bug: Placeholder API Key**
 
-Bug:
-The  function is imported from , but it should be imported from .
+*   **Description:** The code uses a placeholder value (`"YOUR_OPENAI_API_KEY"`) for the `api_key` in the `DeepResearch` client.
+*   **Importance:** This will cause an authentication error when making a request to the API, making the example non-functional.
+*   **Suggested Fix:** Replace the placeholder with a valid OpenAI API key.
 
-Correction:
-Change the import statement to .
+---
 
+### **File: Chapter 7_ Multi-Agent Collaboration - Code Example (ADK + Gemini AgentTooll).ipynb**
 
+**Bug: Raw Function Passed to Tool List**
 
-File: Chapter 5_ Tool Use (using Google Search).ipynb
+*   **Description:** The `get_weather` function is passed to the `tools` list of the `LlmAgent` as a raw function. It should be wrapped in an `AgentTool` or a similar tool construct.
+*   **Importance:** The agent will not be able to properly use the function as a tool without the necessary metadata (like name and description) provided by a `Tool` wrapper.
+*   **Suggested Fix:** Wrap the `get_weather` function in an `AgentTool` before passing it to the agent.
 
-Bug:
-The  list for the  is populated with the  class instead of an instance of the class. The  class expects a list of objects that inherit from .
+    ```python
+    from adk.tools import AgentTool
 
-Correction:
-Instantiate the  tool before passing it to the agent.
+    weather_tool = AgentTool.from_function(get_weather)
+    tools = [weather_tool]
+    ```
 
+---
 
+### **File: Chapter 7_ Multi-Agent Collaboration - Code Example (ADK + Gemini Coordinator).ipynb**
 
+**Bug: Passing a Class Instead of an Instance to the Tool List**
 
-File: Chapter 5_ Tool Use (Vertex AI Search).ipynb
+*   **Description:** The `tools` list of the `coordinator` agent contains the `CodeInterpreterTool` class instead of an instance of the class.
+*   **Importance:** The agent's `tools` parameter expects a list of instantiated `Tool` objects, so this will cause a `TypeError`.
+*   **Suggested Fix:** Instantiate the `CodeInterpreterTool` before passing it to the `tools` list.
 
-Bug:
-The code that sets the  environment variable is commented out, and there is no check to ensure this variable is set before it is used. This will lead to an error when the  is initialized.
+    ```python
+    from adk.tools import CodeInterpreterTool
 
-Correction:
-Uncomment the line for setting the environment variable, or add a check to ensure it is set.
+    # Incorrect:
+    # tools=[CodeInterpreterTool]
+    # Correct:
+    tools=[CodeInterpreterTool()]
+    ```
 
+---
 
+### **File: Chapter 7_ Multi-Agent Collaboration - Code Example (ADK + Gemini Sequential).ipynb**
 
+**Bug: `LlmAgent` Initialized Without a `model`**
 
-File: Chapter 6_ Planning - Code Example.ipynb
+*   **Description:** The `LlmAgent` class is initialized without a `model` parameter. The default `Llm` requires a `model` name to be specified.
+*   **Importance:** This will cause an error because the agent does not know which LLM to use for its operations.
+*   **Suggested Fix:** Add a `model` parameter to the `LlmAgent` initializations.
 
-Bug:
-The  function is called, but there is no check to ensure that the  is set. This will cause an error when the  model is initialized if the key is not in the  file or the environment.
+    ```python
+    from adk.llm import Llm
+    from adk.agent import LlmAgent
 
-Correction:
-Add a check to ensure the API key is available after loading the .env file.
+    llm = Llm(model="gemini-1.5-flash")
+    # Incorrect:
+    # researcher = LlmAgent(prompt=research_prompt)
+    # Correct:
+    researcher = LlmAgent(llm=llm, prompt=research_prompt)
+    ```
 
+---
 
+### **File: Chapter 7_ Multi-Agent Collaboration - Code Example (CrewAI + Gemini).ipynb**
 
+**Bug: Agents Initialized Without an `llm`**
 
-File: Chapter 6_ Planning - Deep Research API Example.ipynb
+*   **Description:** The `researcher` and `writer` agents are initialized without an `llm` parameter.
+*   **Importance:** While CrewAI can sometimes infer the LLM from the environment, it is best practice to explicitly pass the `llm` to each agent to avoid ambiguity and ensure the correct model is used.
+*   **Suggested Fix:** Add the `llm=llm` parameter to the `Agent` initializations.
 
-Bug:
-The code uses a placeholder value for the  in the  client. This will cause an authentication error when making a request to the API.
+    ```python
+    # Incorrect:
+    # researcher = Agent(role='Researcher', goal='...', backstory='...')
+    # Correct:
+    researcher = Agent(role='Researcher', goal='...', backstory='...', llm=llm)
+    ```
 
-Correction:
-Replace "YOUR_OPENAI_API_KEY" with a valid OpenAI API key.
+---
 
+### **File: Chapter 8_ Memory Management - Code Example (ADK MemoryService InMemory Example).ipynb**
 
+**Bug: Placeholder Value for RAG Corpus Resource Name**
 
+*   **Description:** The `rag_corpus_resource_name` variable is assigned a placeholder value.
+*   **Importance:** This makes the code non-functional, as it requires a valid resource name to connect to the Vertex AI RAG service.
+*   **Suggested Fix:** Replace the placeholder with a valid Vertex AI RAG Corpus resource name from your GCP project.
 
-File: Chapter 7_ Multi-Agent Collaboration - Code Example (ADK + Gemini AgentTooll).ipynb
+---
 
-Bug:
-The  function is passed to the  list of the  as a raw function. It should be wrapped in a .
+### **File: Chapter 8_ Memory Management - Code Example (ADK SessionService InMemory and Database).ipynb**
 
-Correction:
-Wrap the  function in a  before passing it to the agent.
+**Bug: Placeholder Values for GCP Configuration**
 
+*   **Description:** The third cell uses placeholder values for `project`, `location`, and `instance`.
+*   **Importance:** These placeholders make the code non-functional. It needs actual values to connect to the GCP services.
+*   **Suggested Fix:** Replace the placeholder values with your actual GCP project information.
 
+---
 
+### **File: Chapter 8_ Memory Management - Code Example (LangChain and LangGraph).ipynb**
 
-File: Chapter 7_ Multi-Agent Collaboration - Code Example (ADK + Gemini Coordinator).ipynb
+**Bug 1: Deprecated `ChatOpenAI` Class**
 
-Bug:
-The  list of the  agent contains the  class instead of an instance of the class. The  parameter expects a list of  instances.
+*   **Description:** The code uses `langchain.chat_models.ChatOpenAI`, which is deprecated.
+*   **Importance:** This will raise a `DeprecationWarning` and may break in future LangChain versions.
+*   **Suggested Fix:** Use `langchain_openai.ChatOpenAI` instead.
 
-Correction:
-Instantiate the  before passing it to the  list.
+**Bug 2: Deprecated `ConversationBufferMemory` Class**
 
+*   **Description:** The code uses `langchain.memory.ConversationBufferMemory`, which is deprecated.
+*   **Importance:** This will raise a `DeprecationWarning`.
+*   **Suggested Fix:** Use `langchain.memory.buffer.ConversationBufferMemory`.
 
+**Bug 3: Deprecated `LLMChain` Class**
 
+*   **Description:** The `LLMChain` class is deprecated.
+*   **Importance:** This will raise a `DeprecationWarning`.
+*   **Suggested Fix:** Use the LangChain Expression Language (LCEL) to create a chain with memory.
 
-File: Chapter 7_ Multi-Agent Collaboration - Code Example (ADK + Gemini Sequential).ipynb
+**Bug 4: Deprecated `AIMessage` and `HumanMessage` Functions**
 
-Bug:
-The  class is initialized without a  parameter. The  (which is the default ) requires a  to be specified.
+*   **Description:** The `AIMessage` and `HumanMessage` functions from `langchain.schema` are deprecated.
+*   **Importance:** This will raise a `DeprecationWarning`.
+*   **Suggested Fix:** Use `langchain_core.messages.AIMessage` and `langchain_core.messages.HumanMessage`.
 
-Correction:
-Add a  parameter to the  initializations.
+---
 
+### **File: Chapter 9_ Adaptation - Code Example (OpenEvolve).ipynb**
 
+**Bug 1: Placeholder File Paths**
 
+*   **Description:** The code uses placeholder paths for `data_path`, `instructions_path`, and `output_dir`.
+*   **Importance:** The code is not runnable without valid file paths.
+*   **Suggested Fix:** Replace the placeholder paths with valid file paths on your system.
 
-File: Chapter 7_ Multi-Agent Collaboration - Code Example (CrewAI + Gemini).ipynb
+**Bug 2: `await` Used Outside of an `async` Function**
 
-Bug:
-The  and  agents are initialized without an  parameter. While CrewAI can sometimes infer the LLM from the environment, it is best practice to explicitly pass the  to each agent to avoid ambiguity.
+*   **Description:** The `await` keyword is used to call `evolver.aevolve()` outside of an `async` function.
+*   **Importance:** This will cause a `SyntaxError`.
+*   **Suggested Fix:** Wrap the `await` call in an `async` function and run it using `asyncio.run()`.
 
-Correction:
-Add the  parameter to the  initializations.
+    ```python
+    import asyncio
 
+    async def main():
+        # ... (rest of the setup)
+        await evolver.aevolve()
 
-
-
-File: Chapter 8_ Memory Management - Code Example (ADK MemoryService InMemory Example).ipynb
-
-Bug:
-The  variable is a placeholder and needs to be replaced with a valid Vertex AI RAG Corpus resource name for the code to be functional. The current value is .
-
-Correction:
-Replace the placeholder with a valid resource name.
-
-
-
-
-File: Chapter 8_ Memory Management - Code Example (ADK SessionService InMemory and Database).ipynb
-
-Bug:
-The third cell uses placeholder values for , , and . These need to be replaced with actual values for the code to work.
-
-Correction:
-Replace the placeholder values with your actual GCP project information.
-
-
-
-
-File: Chapter 8_ Memory Management - Code Example (LangChain and LangGraph).ipynb
-
-Bug 1:
-The  class is deprecated. The output shows a .
-
-Correction:
-Use  instead.
-
-Bug 2:
-The  class is deprecated. It should be replaced with  from .
-
-Correction:
-Replace  with  and  with .
-
-Bug 3:
-The  class is deprecated.
-
-Correction:
-Use the LangChain Expression Language (LCEL) to create a chain with memory.
-
-Bug 4:
-The  and  functions are deprecated. They should be replaced with  and .
-
-Correction:
-Use .
-
-
-
-File: Chapter 9_ Adaptation - Code Example (OpenEvolve).ipynb
-
-Bug 1:
-The code uses placeholder paths for , , and . These need to be replaced with actual file paths for the code to work.
-
-Correction:
-Replace the placeholder paths with valid file paths.
-
-Bug 2:
-The  keyword is used outside of an  function. This will cause a .
-
-Correction:
-Wrap the  call in an  function and run it with .
-
-
+    # Run the async function
+    asyncio.run(main())
+    ```
